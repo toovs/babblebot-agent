@@ -1,4 +1,4 @@
-channel: channelName
+channel: channelName # should match your twitch url
 host: 192.168.1.100 # host ip of master babblebot process
 port: 3003 # port master babblebot process is listening on
 obs_port: 4444 # port of obs-websocket plugin
