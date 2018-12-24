@@ -1,0 +1,51 @@
+name:                babblebot-agent
+version:             0.1.0.0
+github:              "toovs/babblebot"
+license:             BSD3
+author:              "Neill Bolton"
+maintainer:          "toovs@tutamail.com"
+
+extra-source-files:
+- README.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description: Please see the README on Gitlab at <https://gitlab.com/toovs/babblebot/blob/master/README.md>
+
+dependencies:
+- base >= 4.7 && < 5
+
+library:
+  source-dirs: src
+  dependencies:
+  - network
+  - text
+  - yaml
+  - aeson
+  - bytestring
+  - containers
+  - cereal
+  - websockets
+
+executables:
+  babblebot-agent:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -rtsopts
+    dependencies:
+    - babblebot-agent
+
+tests:
+  babblebot-agent-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -rtsopts
+    dependencies:
+    - babblebot-agent

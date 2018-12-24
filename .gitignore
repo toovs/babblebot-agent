@@ -1,0 +1,12 @@
+logs/
+.stack-work/
+state/
+web/.cache/
+web/node_modules/
+web/elm-stuff/
+web/package-lock.json
+babblebot.cabal
+config.yaml
+docker-compose.yml
+.remote-sync.json
+*~
