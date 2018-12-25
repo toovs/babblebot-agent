@@ -15,6 +15,7 @@ import qualified Data.Text as T
 import qualified Network.WebSockets as WS
 import qualified Data.Yaml as Y (ParseException, decodeFileEither)
 import qualified Data.ByteString.Char8 as C (pack, unpack)
+import qualified Data.Sequence as S (empty)
 import qualified Control.Exception as E
 
 import Agent
@@ -26,16 +27,16 @@ babblebotAgent = do
     Left e -> error (show e)
     Right config -> poll config `E.catch` (eHandler config)
   where
-    poll config@(Config channel host port obsPort) = do
+    poll config@(Config channel secret host port obsPort) = do
       withSocketsDo $ do
         handle <- connectTo host (PortNumber (fromIntegral port))
         hSetBuffering handle LineBuffering
-        hPutStrLn handle channel
+        let authAgent = Agent { actions = S.empty, channelName = channel, token = secret }
+            authEncoded = encode authAgent
+        hPutStrLn handle (C.unpack authEncoded)
         contents <- hGetLine handle
-        let agent' = decode $ C.pack contents
-        case agent' of
-          Left err -> putStrLn err
-          Right agent -> mapM_ (runAction obsPort) (actions agent)
+        let Right agent = decode $ C.pack contents
+        mapM_ (runAction obsPort) (actions agent)
         hClose handle
       threadDelay 10000000
       poll config

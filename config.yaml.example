@@ -1,4 +1,5 @@
 channel: channelName # should match your twitch url
+secret: 7tn4e58djt # secret that needs to be shared with master process
 host: 192.168.1.100 # host ip of master babblebot process
 port: 3003 # port master babblebot process is listening on
 obs_port: 4444 # port of obs-websocket plugin
