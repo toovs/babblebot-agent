@@ -7,5 +7,5 @@ module Config
 import GHC.Generics (Generic)
 import Data.Aeson (FromJSON)
 
-data Config = Config { channel :: String, secret :: String, host :: String, port :: Int, obs_port :: Int } deriving (Show, Generic)
+data Config = Config { channel :: String, secret :: String, host :: String, port :: Int, obs_port :: Int, update_repo :: Maybe String } deriving (Show, Generic)
 instance FromJSON Config

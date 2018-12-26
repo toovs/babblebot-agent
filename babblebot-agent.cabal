@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d9e30a1868e8a43f00ea78cc200012003aff1deac48814a5c3b5a53912e01012
+-- hash: f873972885b2e9ffcd9474af2a0e35d4ef1e6633969a590ac5ff280e17604fb0
 
 name:           babblebot-agent
-version:        0.1.1.0
+version:        0.1.2.0
 description:    Please see the README on Gitlab at <https://gitlab.com/toovs/babblebot/blob/master/README.md>
 homepage:       https://github.com/toovs/babblebot#readme
 bug-reports:    https://github.com/toovs/babblebot/issues
@@ -38,9 +38,13 @@ library
     , bytestring
     , cereal
     , containers
+    , directory
+    , lens
     , network
+    , process
     , text
     , websockets
+    , wreq
     , yaml
   default-language: Haskell2010
 

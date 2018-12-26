@@ -1,5 +1,5 @@
 name:                babblebot-agent
-version:             0.1.1.0
+version:             0.1.2.0
 github:              "toovs/babblebot"
 license:             BSD3
 author:              "Neill Bolton"
@@ -23,7 +23,11 @@ dependencies:
 library:
   source-dirs: src
   dependencies:
+  - directory
+  - process
+  - lens
   - network
+  - wreq
   - text
   - yaml
   - aeson
