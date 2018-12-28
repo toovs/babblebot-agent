@@ -1,5 +1,5 @@
 name:                babblebot-agent
-version:             0.1.2.0
+version:             0.1.2.1
 github:              "toovs/babblebot"
 license:             BSD3
 author:              "Neill Bolton"
@@ -35,6 +35,7 @@ library:
   - containers
   - cereal
   - websockets
+  - async
 
 executables:
   babblebot-agent:

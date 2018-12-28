@@ -4,7 +4,7 @@ module Lib
   ( babblebotAgent
   ) where
 
-import System.IO (hClose, hGetLine, hPutStrLn, hSetBuffering, BufferMode(..))
+import System.IO (hClose, hReady, hGetLine, hPutStrLn, hSetBuffering, stdout, BufferMode(..))
 import System.Directory (renameFile, removeFile, getCurrentDirectory, doesFileExist)
 import System.Exit
 import System.Info
@@ -13,6 +13,7 @@ import Data.Monoid ((<>))
 import Data.Serialize
 import Control.Lens ((^.), (.~), (&), (%~))
 import Control.Concurrent
+import Control.Concurrent.Async
 import Network
 import Network.Socket (withSocketsDo)
 import Data.Text (Text, pack, unpack)
@@ -28,9 +29,10 @@ import qualified Control.Exception as E
 import Agent
 import Config
 
-agentVersion = "v0.1.2.0"
+agentVersion = "v0.1.2.1"
 
 babblebotAgent = do
+  hSetBuffering stdout LineBuffering
   dir <- getCurrentDirectory
   case System.Info.os of
     "mingw32" -> do
@@ -42,7 +44,7 @@ babblebotAgent = do
   parsedContent <- Y.decodeFileEither "config.yaml" :: IO (Either Y.ParseException Config)
   case parsedContent of
     Left e -> error (show e)
-    Right config -> poll config-- `E.catch` (eHandler config)
+    Right config -> poll config `E.catch` (eHandler config)
   where
     poll config@(Config channel secret host port obsPort updateRepo) = do
       withSocketsDo $ do
@@ -52,12 +54,18 @@ babblebotAgent = do
             authAgent = Agent { actions = S.singleton update, channelName = channel, token = secret }
             authEncoded = encode authAgent
         hPutStrLn handle (C.unpack authEncoded)
-        contents <- hGetLine handle
-        let Right agent = decode $ C.pack contents
-        mapM_ (runAction updateRepo obsPort) (actions agent)
-        hClose handle
+        contents <- hWaitForLine handle 4
+        case contents of
+          Left _ -> hClose handle
+          Right agent' ->
+            case decode $ C.pack agent' of
+              Left err -> hClose handle
+              Right agent -> do
+                mapM_ (runAction updateRepo obsPort) (actions agent)
+                hClose handle
       threadDelay 10000000
-      poll config
+      poll config `E.catch` (eHandler config)
+    hWaitForLine handle secs = race (threadDelay (secs * 1000000)) (hGetLine handle)
     runAction updateRepo obsPort action = do
       case action of
         Update ver -> do

@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f873972885b2e9ffcd9474af2a0e35d4ef1e6633969a590ac5ff280e17604fb0
+-- hash: d5508d5b339dfceec3f58482c0774a9f562604334b1b4130296f6b7491ef10a4
 
 name:           babblebot-agent
-version:        0.1.2.0
+version:        0.1.2.1
 description:    Please see the README on Gitlab at <https://gitlab.com/toovs/babblebot/blob/master/README.md>
 homepage:       https://github.com/toovs/babblebot#readme
 bug-reports:    https://github.com/toovs/babblebot/issues
@@ -34,6 +34,7 @@ library
       src
   build-depends:
       aeson
+    , async
     , base >=4.7 && <5
     , bytestring
     , cereal
