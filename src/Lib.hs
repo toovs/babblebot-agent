@@ -9,6 +9,7 @@ import System.Directory (renameFile, removeFile, getCurrentDirectory, doesFileEx
 import System.Exit
 import System.Info
 import System.Process (runCommand)
+import System.Win32.Automation.Input (sendInput, makeKeyboardInput)
 import Data.Monoid ((<>))
 import Data.Serialize
 import Control.Lens ((^.), (.~), (&), (%~))
@@ -29,7 +30,7 @@ import qualified Control.Exception as E
 import Agent
 import Config
 
-agentVersion = "v0.1.2.1"
+agentVersion = "v0.2.0.0"
 
 babblebotAgent = do
   hSetBuffering stdout LineBuffering
@@ -90,6 +91,10 @@ babblebotAgent = do
                     _ -> pure ()
                   exitSuccess
                 _ -> pure ()
+        Input key -> do
+          input <- makeKeyboardInput key Nothing
+          sendInput [input]
+          pure ()
         SceneChange name -> do
           withSocketsDo $ WS.runClient "localhost" obsPort "/" $ \conn -> do
             let json = "{\"request-type\":\"SetCurrentScene\",\"scene-name\":\"" <> T.pack name <> "\",\"message-id\":0}"
