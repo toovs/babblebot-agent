@@ -30,7 +30,7 @@ import qualified Control.Exception as E
 import Agent
 import Config
 
-agentVersion = "v0.2.1.0"
+agentVersion = "v0.2.2.0"
 
 babblebotAgent = do
   hSetBuffering stdout LineBuffering
@@ -50,6 +50,7 @@ babblebotAgent = do
     poll config@(Config channel secret host port obsHost obsPort updateRepo) = do
       withSocketsDo $ do
         handle <- connectTo host (PortNumber (fromIntegral port))
+        putStrLn "connected to master babblebot process"
         hSetBuffering handle LineBuffering
         let update = Update { version = agentVersion }
             authAgent = Agent { actions = S.singleton update, channelName = channel, token = secret }
@@ -70,6 +71,7 @@ babblebotAgent = do
     runAction updateRepo obsHost obsPort action = do
       case action of
         Update ver -> do
+          putStrLn "received update action"
           case updateRepo of
             Nothing -> pure ()
             Just repo -> do
@@ -92,15 +94,18 @@ babblebotAgent = do
                   exitSuccess
                 _ -> pure ()
         Input key -> do
+          putStrLn "received input action"
           input <- makeKeyboardInput key Nothing
           sendInput [input]
           pure ()
         SceneChange name -> do
+          putStrLn "received scene-change action"
           withSocketsDo $ WS.runClient obsHost obsPort "/" $ \conn -> do
             let json = "{\"request-type\":\"SetCurrentScene\",\"scene-name\":\"" <> T.pack name <> "\",\"message-id\":0}"
             WS.sendTextData conn json
             WS.sendClose conn ("" :: Text)
     eHandler :: Config -> E.IOException -> IO ()
     eHandler config e = do
+      print e
       threadDelay 10000000
       poll config `E.catch` (eHandler config)
