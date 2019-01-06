@@ -30,7 +30,7 @@ import qualified Control.Exception as E
 import Agent
 import Config
 
-agentVersion = "v0.2.2.0"
+agentVersion = "v0.2.2.1"
 
 babblebotAgent = do
   hSetBuffering stdout LineBuffering
@@ -75,7 +75,7 @@ babblebotAgent = do
           case updateRepo of
             Nothing -> pure ()
             Just repo -> do
-              let url = "https://github.com/" ++ repo ++ "/releases/download/" ++ agentVersion ++ "/babblebot-agent.exe"
+              let url = "https://github.com/" ++ repo ++ "/releases/download/" ++ ver ++ "/babblebot-agent.exe"
               rsp <- W.get url
               let code = rsp ^. W.responseStatus . W.statusCode
                   body = rsp ^. W.responseBody
