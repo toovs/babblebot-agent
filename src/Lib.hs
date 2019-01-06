@@ -47,7 +47,7 @@ babblebotAgent = do
     Left e -> error (show e)
     Right config -> poll config `E.catch` (eHandler config)
   where
-    poll config@(Config channel secret host port obsPort updateRepo) = do
+    poll config@(Config channel secret host port obsHost obsPort updateRepo) = do
       withSocketsDo $ do
         handle <- connectTo host (PortNumber (fromIntegral port))
         hSetBuffering handle LineBuffering
@@ -62,12 +62,12 @@ babblebotAgent = do
             case decode $ C.pack agent' of
               Left err -> hClose handle
               Right agent -> do
-                mapM_ (runAction updateRepo obsPort) (actions agent)
+                mapM_ (runAction updateRepo obsHost obsPort) (actions agent)
                 hClose handle
       threadDelay 10000000
       poll config `E.catch` (eHandler config)
     hWaitForLine handle secs = race (threadDelay (secs * 1000000)) (hGetLine handle)
-    runAction updateRepo obsPort action = do
+    runAction updateRepo obsHost obsPort action = do
       case action of
         Update ver -> do
           case updateRepo of
@@ -96,7 +96,7 @@ babblebotAgent = do
           sendInput [input]
           pure ()
         SceneChange name -> do
-          withSocketsDo $ WS.runClient "localhost" obsPort "/" $ \conn -> do
+          withSocketsDo $ WS.runClient obsHost obsPort "/" $ \conn -> do
             let json = "{\"request-type\":\"SetCurrentScene\",\"scene-name\":\"" <> T.pack name <> "\",\"message-id\":0}"
             WS.sendTextData conn json
             WS.sendClose conn ("" :: Text)
