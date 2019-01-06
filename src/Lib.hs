@@ -30,7 +30,7 @@ import qualified Control.Exception as E
 import Agent
 import Config
 
-agentVersion = "v0.2.0.0"
+agentVersion = "v0.2.1.0"
 
 babblebotAgent = do
   hSetBuffering stdout LineBuffering
