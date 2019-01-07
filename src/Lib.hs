@@ -31,7 +31,7 @@ import qualified Control.Exception as E
 import Agent
 import Config
 
-agentVersion = "v0.2.2.2"
+agentVersion = "v0.2.3.0"
 
 babblebotAgent = do
   hSetBuffering stdout LineBuffering
@@ -94,12 +94,12 @@ babblebotAgent = do
                     _ -> pure ()
                   exitSuccess
                 _ -> pure ()
-        Input key -> do
+        Input keys -> do
           putStrLn "received input action"
-          inputP <- makeKeyboardInput key Nothing
-          sendInput [inputP]
-          inputR <- makeKeyboardInput key (Just (2::Word32))
-          sendInput [inputR]
+          inputP <- sequence $ map (\key -> makeKeyboardInput key Nothing) keys
+          sendInput inputP
+          inputR <- sequence $ map (\key -> makeKeyboardInput key (Just (2::Word32))) keys
+          sendInput inputR
           pure ()
         SceneChange name -> do
           putStrLn "received scene-change action"
