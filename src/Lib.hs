@@ -10,6 +10,7 @@ import System.Exit
 import System.Info
 import System.Process (runCommand)
 import System.Win32.Automation.Input (sendInput, makeKeyboardInput)
+import Data.Word (Word32)
 import Data.Monoid ((<>))
 import Data.Serialize
 import Control.Lens ((^.), (.~), (&), (%~))
@@ -30,7 +31,7 @@ import qualified Control.Exception as E
 import Agent
 import Config
 
-agentVersion = "v0.2.2.1"
+agentVersion = "v0.2.2.2"
 
 babblebotAgent = do
   hSetBuffering stdout LineBuffering
@@ -95,8 +96,10 @@ babblebotAgent = do
                 _ -> pure ()
         Input key -> do
           putStrLn "received input action"
-          input <- makeKeyboardInput key Nothing
-          sendInput [input]
+          inputP <- makeKeyboardInput key Nothing
+          sendInput [inputP]
+          inputR <- makeKeyboardInput key (Just (2::Word32))
+          sendInput [inputR]
           pure ()
         SceneChange name -> do
           putStrLn "received scene-change action"
